@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- encoding: utf-8 -*-
 
+import ssl
 import sys
 import urllib2
 import os
@@ -37,9 +38,11 @@ class Scanner(object):
         with open('index', 'wb') as f:
             f.write(data)
         self.queue = Queue.Queue()
+        blacklist_extensions = (".jpg",".gif",".css",".jpeg",".png",".ttf",".woff",".eot",".otf")
         for entry in parse('index'):
             if "sha1" in entry.keys():
-                self.queue.put((entry["sha1"].strip(), entry["name"].strip()))
+                if not entry["name"].encode('utf-8').strip().lower().endswith(blacklist_extensions):
+                    self.queue.put((entry["sha1"].strip(), entry["name"].strip()))
                 try:
                     print entry['name']
                 except:
@@ -50,7 +53,8 @@ class Scanner(object):
 
     def _request_data(self, url):
         request = urllib2.Request(url, None, {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X)'})
-        return urllib2.urlopen(request).read()
+        context = ssl.create_default_context()
+        context.check_hostname = False
 
     def _print(self, msg):
         self.lock.acquire()
