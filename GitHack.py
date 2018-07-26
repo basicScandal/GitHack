@@ -55,6 +55,7 @@ class Scanner(object):
         request = urllib2.Request(url, None, {'User-Agent': 'Mozilla/5.0 (iPhone; CPU iPhone OS 6_0 like Mac OS X)'})
         context = ssl.create_default_context()
         context.check_hostname = False
+        context.verify_mode = ssl.CERT_NONE
         return urllib2.urlopen(request, context=context).read()
 
     def _print(self, msg):
